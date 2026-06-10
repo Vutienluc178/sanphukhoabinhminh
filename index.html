@@ -1332,7 +1332,7 @@ function _json(obj) {
 <script>
 // ======================== CONFIGS ========================
 const SPREADSHEET_ID = '1R-WhT9_uKdKbQch1gvyqecjW0wuo4a9av2VLLyUdgWg';
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyTT1jVzVOiykgqHRk6Cgkq5T6W1xzxbxLjnYlGLDQpvL121y6pt2St1qaAqFxbAexvXg/exec';
+let WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyTT1jVzVOiykgqHRk6Cgkq5T6W1xzxbxLjnYlGLDQpvL121y6pt2St1qaAqFxbAexvXg/exec';
 const ADMIN_PASSWORD = 'ThanhHoa';
 let _adminUnlocked = false; // mở khóa 1 lần/phiên sau khi nhập đúng mật khẩu
 
@@ -1377,7 +1377,12 @@ const showToast = (msg, isError = false) => {
 const pushDataToGoogle = async (dataObj) => {
     if(!WEB_APP_URL || !WEB_APP_URL.startsWith('https://')) return null;
     try {
-        const res = await fetch(WEB_APP_URL, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(dataObj) });
+        const res = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            credentials: 'omit',
+            headers: {'Content-Type':'text/plain;charset=utf-8'},
+            body: JSON.stringify(dataObj)
+        });
         return await res.json();
     } catch(e) { console.warn('GSheets push:', e); return null; }
 };
@@ -1417,7 +1422,7 @@ const syncFromSheets = async () => {
     _syncInProgress = true;
     _setSyncStatus('syncing');
     try {
-        const res = await fetch(WEB_APP_URL);
+        const res = await fetch(WEB_APP_URL, { credentials: 'omit' });
         const json = await res.json();
         if(json.status === 'ok' && !json.empty && json.data) {
             const d = json.data;
@@ -2394,6 +2399,10 @@ const loadSettings = () => {
 };
 
 const applySettings = () => {
+    // Sync runtime URL variable từ settings (quan trọng!)
+    if(appSettings.webAppUrl && appSettings.webAppUrl.startsWith('https://')) {
+        WEB_APP_URL = appSettings.webAppUrl;
+    }
     // Patch print area with clinic info (using IDs from new design)
     const _s = (id, v) => { const el=document.getElementById(id); if(el) el.innerText=v; };
     _s('print-clinic-name',    appSettings.clinicName.toUpperCase());
@@ -2476,8 +2485,8 @@ const testGoogleConnection = async () => {
     resultEl.innerText = '⏳ Đang kiểm tra kết nối...';
     resultEl.classList.remove('hidden');
     try {
-        // Test doGet first (read-back confirms 2-way sync works)
-        const res = await fetch(url);
+        // credentials:'omit' bắt buộc — tránh cookie Google gây redirect auth
+        const res = await fetch(url, { credentials: 'omit' });
         const json = await res.json();
         if(json.status === 'ok') {
             const hasData = !json.empty && json.data && Object.keys(json.data).length > 0;
@@ -2490,7 +2499,14 @@ const testGoogleConnection = async () => {
         }
     } catch(err) {
         resultEl.className = 'mt-3 text-sm p-3 rounded-lg border bg-red-50 border-red-200 text-red-700';
-        resultEl.innerHTML = `<i class="fa-solid fa-circle-xmark mr-2"></i>Lỗi kết nối: <strong>${err.message}</strong>. Kiểm tra URL và kết nối mạng.`;
+        const isCors = err.message === 'Failed to fetch';
+        resultEl.innerHTML = isCors
+            ? `<i class="fa-solid fa-circle-xmark mr-2"></i><strong>Lỗi CORS / Quyền truy cập.</strong><br>
+               Kiểm tra lại 3 điều:<br>
+               1. Apps Script đã <strong>Deploy → New version</strong> chưa?<br>
+               2. Mục <em>"Who has access"</em> phải chọn <strong>Anyone</strong> (không phải "Only myself")<br>
+               3. URL đã copy đúng chưa? (phải kết thúc bằng <code>/exec</code>)`
+            : `<i class="fa-solid fa-circle-xmark mr-2"></i>Lỗi: <strong>${err.message}</strong>`;
     }
 };
 
