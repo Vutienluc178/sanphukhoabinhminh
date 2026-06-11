@@ -902,7 +902,7 @@
             <div class="max-w-3xl mx-auto">
                 <div class="mb-6">
                     <h2 class="text-2xl font-bold text-slate-800">Hướng Dẫn Đồng Bộ Google Sheets</h2>
-                    <p class="text-slate-500 mt-1 text-sm">Làm theo 5 bước dưới đây để dữ liệu tự động ghi lên Google Sheets</p>
+                    <p class="text-slate-500 mt-1 text-sm">Làm theo 6 bước dưới đây để dữ liệu tự động ghi lên Google Sheets</p>
                 </div>
 
                 <!-- Overview banner -->
@@ -925,19 +925,11 @@
                         <h3 class="font-bold text-slate-700">Tạo Google Sheets mới</h3>
                     </div>
                     <div class="p-5 space-y-3 text-sm text-slate-700">
-                        <p>Truy cập <a href="https://sheets.google.com" target="_blank" class="text-teal-600 font-bold hover:underline">sheets.google.com</a> → Tạo bảng tính mới.</p>
-                        <p>Tạo <strong>5 sheet</strong> (tab) với tên chính xác như sau:</p>
-                        <div class="grid grid-cols-5 gap-2 mt-2">
-                            <div class="bg-green-50 border border-green-200 rounded-lg p-2 text-center"><p class="font-bold text-green-700 text-xs">HoaDon</p><p class="text-[10px] text-green-600 mt-0.5">Lưu hóa đơn</p></div>
-                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center"><p class="font-bold text-blue-700 text-xs">ChamCong</p><p class="text-[10px] text-blue-600 mt-0.5">Chấm công</p></div>
-                            <div class="bg-red-50 border border-red-200 rounded-lg p-2 text-center"><p class="font-bold text-red-700 text-xs">PhieuChi</p><p class="text-[10px] text-red-600 mt-0.5">Chi tiêu</p></div>
-                            <div class="bg-purple-50 border border-purple-200 rounded-lg p-2 text-center"><p class="font-bold text-purple-700 text-xs">DichVu</p><p class="text-[10px] text-purple-600 mt-0.5">Danh mục DV</p></div>
-                            <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-center"><p class="font-bold text-amber-700 text-xs">Thuoc</p><p class="text-[10px] text-amber-600 mt-0.5">Danh mục thuốc</p></div>
-                        </div>
-                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 mt-3">
-                            <i class="fa-solid fa-lightbulb mr-1"></i> <strong>Mẹo:</strong> Sheet <code>DichVu</code> và <code>Thuoc</code> dùng để app tải danh mục. Cột A = ID, Cột B = Tên, Cột C = Giá, Cột D = Đơn vị (chỉ Thuoc).
-                        </div>
+                        <p>Truy cập <a href="https://sheets.google.com" target="_blank" class="text-teal-600 font-bold hover:underline">sheets.google.com</a> → Tạo bảng tính trống mới (chưa cần tạo sheet/tab nào — Bước 4 sẽ tự tạo đầy đủ).</p>
                         <p class="text-[11px] text-slate-500">📋 Sao chép <strong>Spreadsheet ID</strong> từ URL: <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700">docs.google.com/spreadsheets/d/<span class="font-bold text-teal-600">[COPY PHẦN NÀY]</span>/edit</code></p>
+                        <div class="bg-teal-50 border border-teal-200 rounded-lg p-3 text-xs text-teal-800 mt-1">
+                            <i class="fa-solid fa-circle-info mr-1"></i> <strong>Bước 4</strong> bên dưới sẽ tự động tạo <strong>6 sheet chuẩn</strong>: <code>DichVu</code>, <code>Thuoc</code>, <code>HoaDon</code>, <code>PhieuChi</code>, <code>ChamCong</code>, <code>SYNC</code> — kèm dữ liệu mẫu cho danh mục dịch vụ/thuốc.
+                        </div>
                     </div>
                 </div>
 
@@ -965,8 +957,103 @@
                     <div class="p-5">
                         <p class="text-sm text-slate-600 mb-3">Copy toàn bộ đoạn code bên dưới và dán vào Apps Script Editor:</p>
                         <div class="relative">
-                            <pre class="bg-slate-900 text-green-300 rounded-xl p-4 text-[11px] overflow-x-auto custom-scrollbar leading-relaxed"><code id="apps-script-code">// GynoFlow Apps Script v2 — 2 chiều (doGet + doPost)
-// Dán toàn bộ vào Apps Script Editor → Deploy → Web App → Anyone
+                            <pre class="bg-slate-900 text-green-300 rounded-xl p-4 text-[11px] overflow-x-auto custom-scrollbar leading-relaxed"><code id="apps-script-code">// GynoFlow Apps Script v2 — 2 chiều (doGet + doPost) + Setup tự động
+// BƯỚC 1: Dán đè toàn bộ code này vào Apps Script Editor (Ctrl+A rồi dán)
+// BƯỚC 2: Chọn hàm "setupSheets" ở thanh công cụ → bấm ▶ Run (chạy 1 lần)
+// BƯỚC 3: Deploy → New deployment → Web app → Who has access: Anyone
+
+// ════════════════════════════════════════════════════════════
+// setupSheets(): Tạo đầy đủ 6 sheet đúng chuẩn GynoFlow + dữ liệu mẫu
+// CHẠY HÀM NÀY 1 LẦN trước khi Deploy (chọn "setupSheets" → Run)
+// Nếu sheet đã có dữ liệu, hàm sẽ bỏ qua — không ghi đè dữ liệu cũ
+// ════════════════════════════════════════════════════════════
+function setupSheets() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  function ensureSheet(name, headers, color, sampleRows) {
+    let sh = ss.getSheetByName(name);
+    if (!sh) sh = ss.insertSheet(name);
+    if (sh.getLastRow() === 0) {
+      sh.getRange(1, 1, 1, headers.length).setValues([headers])
+        .setFontWeight('bold').setFontColor('#ffffff')
+        .setBackground(color).setHorizontalAlignment('center');
+      sh.setFrozenRows(1);
+      if (sampleRows && sampleRows.length) {
+        sh.getRange(2, 1, sampleRows.length, headers.length).setValues(sampleRows);
+      }
+      sh.autoResizeColumns(1, headers.length);
+    }
+    return sh;
+  }
+
+  // 1) DichVu — Danh mục dịch vụ (app đọc qua gviz: A=ID B=Tên C=Giá D=Đơn vị, dòng 1 = tiêu đề)
+  ensureSheet('DichVu', ['ID', 'Tên Dịch Vụ', 'Giá', 'Đơn Vị'], '#7e22ce', [
+    ['SVC001', 'Khám phụ khoa tổng quát', 150000, 'Lần'],
+    ['SVC002', 'Siêu âm bụng tổng quát', 200000, 'Lần'],
+    ['SVC003', 'Siêu âm đầu dò âm đạo', 250000, 'Lần'],
+    ['SVC004', 'Xét nghiệm máu tổng quát', 180000, 'Lần'],
+    ['SVC005', 'Xét nghiệm nước tiểu', 50000, 'Lần'],
+    ['SVC006', 'Soi tươi cổ tử cung (PAP)', 300000, 'Lần'],
+    ['SVC007', 'Tư vấn thai sản', 100000, 'Lần'],
+    ['SVC008', 'Tiêm ngừa', 120000, 'Mũi'],
+    ['SVC009', 'Đặt thuốc âm đạo', 80000, 'Lần'],
+    ['SVC010', 'Tiểu thủ thuật nhỏ', 500000, 'Lần']
+  ]);
+
+  // 2) Thuoc — Danh mục thuốc/vật tư (cùng cấu trúc A=ID B=Tên C=Giá D=Đơn vị)
+  ensureSheet('Thuoc', ['ID', 'Tên Thuốc', 'Giá', 'Đơn Vị'], '#b45309', [
+    ['MED001', 'Paracetamol 500mg', 2000, 'Viên'],
+    ['MED002', 'Amoxicillin 500mg', 3000, 'Viên'],
+    ['MED003', 'Vitamin tổng hợp', 5000, 'Viên'],
+    ['MED004', 'Sắt + Acid Folic', 4000, 'Viên'],
+    ['MED005', 'Thuốc đặt phụ khoa', 15000, 'Viên'],
+    ['MED006', 'Dung dịch vệ sinh phụ nữ', 80000, 'Chai'],
+    ['MED007', 'Que thử thai', 25000, 'Cái'],
+    ['MED008', 'Băng vệ sinh', 30000, 'Gói']
+  ]);
+
+  // 3) HoaDon — Sổ ghi hóa đơn / hủy hóa đơn (Apps Script tự ghi khi app gửi lên)
+  ensureSheet('HoaDon', ['Thời Gian', 'Mã BN', 'Tên BN', 'Năm Sinh', 'SĐT', 'Tổng Tiền', 'Chi Tiết', 'Nhân Viên', 'Ghi Nhận Lúc'], '#15803d');
+
+  // 4) PhieuChi — Sổ ghi chi phí
+  ensureSheet('PhieuChi', ['Ngày', 'Mã Phiếu', 'Số Tiền', 'Loại', 'Lý Do', 'Nhân Viên', 'Ghi Nhận Lúc'], '#b91c1c');
+
+  // 5) ChamCong — Sổ chấm công / chốt ca
+  ensureSheet('ChamCong', ['Ngày', 'Giờ / Loại', 'Nhân Viên', 'Ca', 'Dự Kiến', 'Thực Tế', 'Chênh Lệch', 'Ghi Chú', 'Ghi Nhận Lúc'], '#1d4ed8');
+
+  // 6) SYNC — Snapshot toàn bộ dữ liệu (doGet/doPost dùng sheet này để đồng bộ 2 chiều)
+  let sync = ss.getSheetByName('SYNC');
+  if (!sync) sync = ss.insertSheet('SYNC');
+  if (sync.getLastRow() === 0) {
+    const now = new Date().toLocaleString('vi-VN');
+    sync.getRange('A1:B1').setValues([['lastSync', now]]);
+    const placeholders = {
+      patientDB: '{}', appointments: '[]',
+      invoiceHistory: '[]', expenses: '[]',
+      CATALOG: '{"services":[],"medicines":[]}'
+    };
+    Object.keys(placeholders).forEach(function(k, i) {
+      sync.getRange('A' + (i + 2)).setValue(k);
+      sync.getRange('B' + (i + 2)).setValue(placeholders[k]);
+    });
+    sync.getRange('A1:A6').setFontWeight('bold');
+    sync.setColumnWidth(2, 350);
+  }
+
+  // Dọn sheet mặc định "Sheet1" nếu còn trống
+  const def = ss.getSheetByName('Sheet1');
+  if (def && def.getLastRow() === 0 && ss.getSheets().length > 1) {
+    ss.deleteSheet(def);
+  }
+
+  // Sắp xếp lại thứ tự các tab cho dễ nhìn
+  ['DichVu', 'Thuoc', 'HoaDon', 'PhieuChi', 'ChamCong', 'SYNC'].forEach(function(name, idx) {
+    const sh = ss.getSheetByName(name);
+    if (sh) { ss.setActiveSheet(sh); ss.moveActiveSheet(idx + 1); }
+  });
+
+  SpreadsheetApp.getActiveSpreadsheet().toast('Đã khởi tạo đầy đủ 6 sheet theo chuẩn GynoFlow!', 'Setup hoàn tất', 8);
+}
 
 function doPost(e) {
   try {
@@ -992,7 +1079,7 @@ function doPost(e) {
     if (data.action === 'invoice') {
       const sh = ss.getSheetByName('HoaDon') || ss.insertSheet('HoaDon');
       sh.appendRow([data.timestamp, data.patientId, data.patientName,
-        data.patientYob, data.patientPhone, data.totalAmount, data.details, now]);
+        data.patientYob, data.patientPhone, data.totalAmount, data.details, data.staffName, now]);
     }
     if (data.action === 'expense') {
       const sh = ss.getSheetByName('PhieuChi') || ss.insertSheet('PhieuChi');
@@ -1058,6 +1145,42 @@ function _json(obj) {
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-4">
                     <div class="flex items-center gap-4 px-5 py-4 border-b border-slate-100 bg-slate-50">
                         <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center font-black text-sm shrink-0">4</div>
+                        <h3 class="font-bold text-slate-700">Chạy setupSheets() — khởi tạo cấu trúc Sheet</h3>
+                    </div>
+                    <div class="p-5 space-y-3 text-sm text-slate-700">
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 bg-slate-200 rounded-full flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 mt-0.5">a</div>
+                            <p>Trên thanh công cụ Apps Script Editor, ở ô chọn hàm (cạnh nút <strong>Run</strong> ▶), chọn hàm <code class="bg-slate-100 px-1.5 py-0.5 rounded text-teal-700 font-bold">setupSheets</code></p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 bg-slate-200 rounded-full flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 mt-0.5">b</div>
+                            <p>Bấm nút <strong class="bg-blue-600 text-white px-2 py-0.5 rounded text-xs">▶ Run</strong> — lần đầu Google sẽ hỏi cấp quyền: chọn tài khoản → <strong>Advanced</strong> → <strong>Go to ... (unsafe)</strong> → <strong>Allow</strong></p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 bg-slate-200 rounded-full flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 mt-0.5">c</div>
+                            <p>Quay lại Google Sheets — sẽ thấy <strong>6 tab mới</strong> được tạo tự động kèm dữ liệu mẫu:</p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mt-1">
+                            <div class="bg-purple-50 border border-purple-200 rounded-lg p-2 text-center"><p class="font-bold text-purple-700 text-xs">DichVu</p><p class="text-[10px] text-purple-600 mt-0.5">Danh mục dịch vụ</p></div>
+                            <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-center"><p class="font-bold text-amber-700 text-xs">Thuoc</p><p class="text-[10px] text-amber-600 mt-0.5">Danh mục thuốc</p></div>
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-2 text-center"><p class="font-bold text-green-700 text-xs">HoaDon</p><p class="text-[10px] text-green-600 mt-0.5">Sổ hóa đơn</p></div>
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-2 text-center"><p class="font-bold text-red-700 text-xs">PhieuChi</p><p class="text-[10px] text-red-600 mt-0.5">Sổ chi phí</p></div>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-2 text-center"><p class="font-bold text-blue-700 text-xs">ChamCong</p><p class="text-[10px] text-blue-600 mt-0.5">Chấm công</p></div>
+                            <div class="bg-slate-100 border border-slate-200 rounded-lg p-2 text-center"><p class="font-bold text-slate-700 text-xs">SYNC</p><p class="text-[10px] text-slate-500 mt-0.5">Dữ liệu đồng bộ</p></div>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 mt-2">
+                            <i class="fa-solid fa-lightbulb mr-1"></i> <strong>Mẹo:</strong> Sheet <code>DichVu</code>/<code>Thuoc</code> — dòng 1 là tiêu đề, dòng 2 trở đi là dữ liệu (Cột A=ID, B=Tên, C=Giá, D=Đơn Vị). Sửa/thêm/xóa dòng dữ liệu mẫu theo bảng giá thực tế của phòng khám.
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-600 mt-1">
+                            Chỉ cần chạy <code>setupSheets()</code> <strong>1 lần</strong>. Nếu sheet đã có dữ liệu sẵn, hàm sẽ bỏ qua — không ghi đè.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-4">
+                    <div class="flex items-center gap-4 px-5 py-4 border-b border-slate-100 bg-slate-50">
+                        <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center font-black text-sm shrink-0">5</div>
                         <h3 class="font-bold text-slate-700">Deploy Web App</h3>
                     </div>
                     <div class="p-5 space-y-3 text-sm text-slate-700">
@@ -1089,10 +1212,10 @@ function _json(obj) {
                     </div>
                 </div>
 
-                <!-- Step 5 -->
+                <!-- Step 6 -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-4">
                     <div class="flex items-center gap-4 px-5 py-4 border-b border-slate-100 bg-slate-50">
-                        <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center font-black text-sm shrink-0">5</div>
+                        <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center font-black text-sm shrink-0">6</div>
                         <h3 class="font-bold text-slate-700">Dán URL vào Cài Đặt & Kiểm Tra</h3>
                     </div>
                     <div class="p-5 space-y-3 text-sm text-slate-700">
@@ -1535,7 +1658,7 @@ const fetchCatalogFromSheets = async () => {
     const medSheet = appSettings.sheetMedicine || 'Thuoc';
     try {
         const fetchTab = async (tab) => {
-            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tab)}`;
+            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tab)}&range=A2:D2000`;
             const res = await fetch(url, { credentials: 'omit' });
             if(!res.ok) throw new Error(`HTTP ${res.status}`);
             const txt = await res.text();
@@ -1844,7 +1967,7 @@ const processAndPrint = () => {
     }
 
     saveToLocal(); renderReports(); renderInvoiceTab();
-    pushDataToGoogle({action:'invoice',timestamp:new Date().toLocaleString('vi-VN'),patientId:invR.patient.id,patientName:invR.patient.name,patientYob:invR.patient.yob,patientPhone:invR.patient.phone,totalAmount:invR.total,details:invR.items.map(i=>`${i.name}(SL:${i.qty})`).join(', ')});
+    pushDataToGoogle({action:'invoice',timestamp:new Date().toLocaleString('vi-VN'),patientId:invR.patient.id,patientName:invR.patient.name,patientYob:invR.patient.yob,patientPhone:invR.patient.phone,totalAmount:invR.total,details:invR.items.map(i=>`${i.name}(SL:${i.qty})`).join(', '),staffName:currentUser.name});
 
     // Open preview modal
     const modal = document.getElementById('modal-invoice-preview');
@@ -2829,7 +2952,7 @@ const submitQuickInv = () => {
     renderInvoiceTab();
     pushDataToGoogle({ action:'invoice', timestamp: new Date().toLocaleString('vi-VN'),
         patientName: name, patientPhone: phone, totalAmount: invR.total,
-        details: qiItems.map(i=>`${i.name}(SL:${i.qty})`).join(', ') });
+        details: qiItems.map(i=>`${i.name}(SL:${i.qty})`).join(', '), staffName: currentUser.name });
 
     // Populate print-area (reuse processAndPrint's logic)
     _invOriginTab = 'consultation';
