@@ -112,7 +112,7 @@
                 <div style="flex:1;">
                     <div id="print-clinic-name" style="font-size:13px;font-weight:900;text-transform:uppercase;color:#0f766e;letter-spacing:.6px;line-height:1.2;">PHÒNG KHÁM SẢN PHỤ KHOA BÌNH MINH</div>
                     <div id="print-clinic-addr" style="font-size:9.5px;color:#64748b;margin-top:3px;">Đ/c: 2B Kênh nước đen - P. Bình Hưng Hòa - TP. Hồ Chí Minh</div>
-                    <div id="print-clinic-contact" style="font-size:9.5px;color:#64748b;margin-top:1px;">SĐT: 0969.068.849 &nbsp;|&nbsp; Bác sĩ: Lê Đàm Vân (BV Từ Dũ)</div>
+                    <div id="print-clinic-contact" style="font-size:9.5px;color:#64748b;margin-top:1px;">SĐT: 0906.404.312 &nbsp;|&nbsp; Bác sĩ: Lê Đàm Vân (BV Từ Dũ)</div>
                 </div>
                 <div style="text-align:right;flex-shrink:0;padding-left:8px;">
                     <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;">Số HĐ</div>
@@ -795,7 +795,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Số Điện Thoại</label>
-                                <input type="text" id="cfg-clinic-phone" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-teal-500 text-sm" placeholder="0969.068.849">
+                                <input type="text" id="cfg-clinic-phone" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-teal-500 text-sm" placeholder="0906.404.312">
                             </div>
                         </div>
                         <div>
@@ -2393,7 +2393,7 @@ const cancelAppointment = (apptId) => {
 const copyZaloReminder = (apptId) => {
     const appt=appointments.find(a=>a.id===apptId); if(!appt) return;
     const dateDisplay=dateToDisplay(appt.date);
-    const msg=`Xin chào ${appt.patientName}, Phòng khám Sản Phụ Khoa Bình Minh xin nhắc lịch ${appt.type.toLowerCase()} vào lúc ${appt.time} ngày ${dateDisplay}. Vui lòng đến đúng giờ. Liên hệ: 0969.068.849. Xin cảm ơn!`;
+    const msg=`Xin chào ${appt.patientName}, Phòng khám Sản Phụ Khoa Bình Minh xin nhắc lịch ${appt.type.toLowerCase()} vào lúc ${appt.time} ngày ${dateDisplay}. Vui lòng đến đúng giờ. Liên hệ: 0906.404.312. Xin cảm ơn!`;
     if(navigator.clipboard){
         navigator.clipboard.writeText(msg).then(()=>showToast('Đã copy tin nhắn Zalo! Paste vào Zalo để gửi.'));
     } else {
@@ -2529,7 +2529,7 @@ const bookApptForPhone = (phone) => {
 const DEFAULT_SETTINGS = {
     clinicName:    'Phòng Khám Sản Phụ Khoa Bình Minh',
     clinicAddr:    '2B Kênh nước đen - P. Bình Hưng Hòa - TP. Hồ Chí Minh',
-    clinicPhone:   '0969.068.849',
+    clinicPhone:   '0906.404.312',
     doctor:        'BS. Lê Đàm Vân',
     invoiceFooter: 'Cảm ơn quý khách đã tin tưởng dịch vụ của phòng khám!',
     sheetId:       '1R-WhT9_uKdKbQch1gvyqecjW0wuo4a9av2VLLyUdgWg',
