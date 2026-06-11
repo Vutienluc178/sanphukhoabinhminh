@@ -982,10 +982,13 @@
                     <div class="p-5">
                         <p class="text-sm text-slate-600 mb-3">Copy toàn bộ đoạn code bên dưới và dán vào Apps Script Editor:</p>
                         <div class="relative">
-                            <pre class="bg-slate-900 text-green-300 rounded-xl p-4 text-[11px] overflow-x-auto custom-scrollbar leading-relaxed"><code id="apps-script-code">// VTL Apps Script v2 — 2 chiều (doGet + doPost) + Setup tự động
+                            <pre class="bg-slate-900 text-green-300 rounded-xl p-4 text-[11px] overflow-x-auto custom-scrollbar leading-relaxed"><code id="apps-script-code">// VTL Apps Script v3 — 2 chiều (doGet + doPost) + Setup tự động
 // BƯỚC 1: Dán đè toàn bộ code này vào Apps Script Editor (Ctrl+A rồi dán)
 // BƯỚC 2: Chọn hàm "setupSheets" ở thanh công cụ → bấm ▶ Run (chạy 1 lần)
 // BƯỚC 3: Deploy → New deployment → Web app → Who has access: Anyone
+// LƯU Ý (nâng cấp từ v2): nếu đã deploy trước đó, hãy dán đè code mới này rồi
+// chọn Deploy → Manage deployments → biểu tượng bút chì → Version: New version → Deploy
+// để bật đồng bộ Hàng Đợi Khám hôm nay + Lịch sử hủy hóa đơn giữa nhiều máy.
 
 // ════════════════════════════════════════════════════════════
 // setupSheets(): Tạo đầy đủ 6 sheet đúng chuẩn VTL + dữ liệu mẫu
@@ -1054,14 +1057,15 @@ function setupSheets() {
     sync.getRange('A1:B1').setValues([['lastSync', now]]);
     const placeholders = {
       patientDB: '{}', appointments: '[]',
-      invoiceHistory: '[]', expenses: '[]',
+      invoiceHistory: '[]', voidHistory: '[]', expenses: '[]',
+      dailyQueue: '[]', queueDate: '""',
       CATALOG: '{"services":[],"medicines":[]}'
     };
     Object.keys(placeholders).forEach(function(k, i) {
       sync.getRange('A' + (i + 2)).setValue(k);
       sync.getRange('B' + (i + 2)).setValue(placeholders[k]);
     });
-    sync.getRange('A1:A6').setFontWeight('bold');
+    sync.getRange('A1:A' + (Object.keys(placeholders).length + 1)).setFontWeight('bold');
     sync.setColumnWidth(2, 350);
   }
 
@@ -1090,7 +1094,7 @@ function doPost(e) {
     if (data.action === 'syncAll') {
       const sh = ss.getSheetByName('SYNC') || ss.insertSheet('SYNC');
       sh.clearContents();
-      const keys = ['patientDB','appointments','invoiceHistory','expenses','CATALOG'];
+      const keys = ['patientDB','appointments','invoiceHistory','voidHistory','expenses','dailyQueue','queueDate','CATALOG'];
       sh.getRange('A1').setValue('lastSync');
       sh.getRange('B1').setValue(now);
       keys.forEach(function(k, i) {
@@ -1575,6 +1579,8 @@ const pushDataToGoogle = async (dataObj) => {
 
 let _syncDebounceTimer = null;
 let _syncInProgress = false;
+let _localDirty = false; // true khi có thay đổi cục bộ chưa kịp đẩy lên Sheets
+let _autoSyncInterval = null;
 
 const _setSyncStatus = (state) => {
     const icon = document.getElementById('sync-status-icon');
@@ -1594,17 +1600,21 @@ const _setSyncStatus = (state) => {
 };
 
 const pushSnapshotToGoogle = () => {
-    if(_syncInProgress || !WEB_APP_URL || !WEB_APP_URL.startsWith('https://')) return;
+    if(!WEB_APP_URL || !WEB_APP_URL.startsWith('https://')) return;
+    _localDirty = true; // đánh dấu có thay đổi cục bộ chưa đẩy lên — tránh bị syncFromSheets ghi đè
     clearTimeout(_syncDebounceTimer);
     _syncDebounceTimer = setTimeout(async () => {
         _setSyncStatus('syncing');
-        const r = await pushDataToGoogle({ action:'syncAll', patientDB, appointments, invoiceHistory, expenses, CATALOG });
+        const r = await pushDataToGoogle({ action:'syncAll', queueDate: getTodayString(), dailyQueue, voidHistory, patientDB, appointments, invoiceHistory, expenses, CATALOG });
+        _localDirty = false;
         _setSyncStatus(r?.status === 'ok' ? 'ok' : 'error');
     }, 2500);
 };
 
-const syncFromSheets = async () => {
-    if(!WEB_APP_URL || !WEB_APP_URL.startsWith('https://')) { showToast('Chưa cấu hình URL Google Sheets.', true); return; }
+const syncFromSheets = async (silent = false) => {
+    if(!WEB_APP_URL || !WEB_APP_URL.startsWith('https://')) { if(!silent) showToast('Chưa cấu hình URL Google Sheets.', true); return; }
+    // Bỏ qua nếu đang đồng bộ dở hoặc đang có thay đổi cục bộ chưa kịp đẩy lên (tránh ghi đè dữ liệu vừa nhập)
+    if(_syncInProgress || _localDirty) return;
     _syncInProgress = true;
     _setSyncStatus('syncing');
     try {
@@ -1612,33 +1622,45 @@ const syncFromSheets = async () => {
         const json = await res.json();
         if(json.status === 'ok' && !json.empty && json.data) {
             const d = json.data;
+            const today = getTodayString();
             let changed = false;
             if(d.patientDB && Object.keys(d.patientDB).length > 0)          { patientDB = d.patientDB; changed = true; }
             if(d.appointments && d.appointments.length > 0)                  { appointments = d.appointments; changed = true; }
             if(d.invoiceHistory && d.invoiceHistory.length > 0)              { invoiceHistory = d.invoiceHistory; changed = true; }
+            if(d.voidHistory && d.voidHistory.length > 0)                    { voidHistory = d.voidHistory; changed = true; }
             if(d.expenses && d.expenses.length > 0)                          { expenses = d.expenses; changed = true; }
             if(d.CATALOG && (d.CATALOG.services?.length||0) + (d.CATALOG.medicines?.length||0) > 0) { CATALOG = d.CATALOG; changed = true; }
+            // Hàng đợi Khám: chỉ đồng bộ nếu Sheets đang giữ hàng đợi của ĐÚNG NGÀY HÔM NAY
+            // (chia sẻ hàng đợi giữa các máy trong ngày; sang ngày mới mỗi máy tự làm mới)
+            if(d.queueDate === today && Array.isArray(d.dailyQueue)) {
+                dailyQueue = d.dailyQueue;
+                localStorage.setItem('gf_date', today);
+                changed = true;
+            }
             if(changed) {
                 // Write to localStorage (no re-push)
                 localStorage.setItem('gf_patients', JSON.stringify(patientDB));
                 localStorage.setItem('gf_appointments', JSON.stringify(appointments));
                 localStorage.setItem('gf_invoices', JSON.stringify(invoiceHistory));
+                localStorage.setItem('gf_voids', JSON.stringify(voidHistory));
                 localStorage.setItem('gf_expenses', JSON.stringify(expenses));
+                localStorage.setItem('gf_queue', JSON.stringify(dailyQueue));
                 // Refresh UI
                 renderQueue(); renderReports(); renderInvoiceTab();
                 updatePatientsBadge(); updateApptBadge();
-                showToast(`Đồng bộ xong${json.lastSync ? ' (' + json.lastSync + ')' : ''}`);
-            } else {
+                if(typeof renderAppointmentsTab === 'function') renderAppointmentsTab();
+                if(!silent) showToast(`Đồng bộ xong${json.lastSync ? ' (' + json.lastSync + ')' : ''}`);
+            } else if(!silent) {
                 showToast('Dữ liệu đã mới nhất.');
             }
         } else if(json.empty) {
-            showToast('Sheets chưa có snapshot — lưu dữ liệu sẽ tự đồng bộ.');
+            if(!silent) showToast('Sheets chưa có snapshot — lưu dữ liệu sẽ tự đồng bộ.');
         }
         _setSyncStatus('ok');
     } catch(e) {
         console.warn('syncFromSheets failed:', e);
         _setSyncStatus('error');
-        showToast('Không kết nối được Sheets — dùng dữ liệu cục bộ.', true);
+        if(!silent) showToast('Không kết nối được Sheets — dùng dữ liệu cục bộ.', true);
     } finally {
         _syncInProgress = false;
     }
@@ -1667,12 +1689,19 @@ const savePersistentData = () => {
     pushSnapshotToGoogle();
 };
 const loadFromLocal = () => {
+    // Lịch sử (hóa đơn, hủy HĐ, chi phí): luôn tải toàn bộ, không phụ thuộc ngày
+    // — tránh bị mất dữ liệu cũ khi sang ngày mới (dữ liệu này dùng cho Thống Kê/Báo cáo thuế)
+    invoiceHistory = JSON.parse(localStorage.getItem('gf_invoices') || '[]');
+    voidHistory = JSON.parse(localStorage.getItem('gf_voids') || '[]');
+    expenses = JSON.parse(localStorage.getItem('gf_expenses') || '[]');
+    // Hàng đợi Khám: chỉ giữ nếu cùng ngày — sang ngày mới sẽ làm mới
+    // (nếu máy khác đã có hàng đợi hôm nay trên Sheets, syncFromSheets() sẽ khôi phục lại)
     if(localStorage.getItem('gf_date') === getTodayString()) {
         dailyQueue = JSON.parse(localStorage.getItem('gf_queue') || '[]');
-        invoiceHistory = JSON.parse(localStorage.getItem('gf_invoices') || '[]');
-        voidHistory = JSON.parse(localStorage.getItem('gf_voids') || '[]');
-        expenses = JSON.parse(localStorage.getItem('gf_expenses') || '[]');
-    } else { saveToLocal(); }
+    } else {
+        dailyQueue = [];
+        localStorage.setItem('gf_date', getTodayString());
+    }
     // Always load persistent data (not tied to daily reset)
     patientDB = JSON.parse(localStorage.getItem('gf_patients') || '{}');
     appointments = JSON.parse(localStorage.getItem('gf_appointments') || '[]');
@@ -1782,6 +1811,9 @@ const completeLogin = () => {
             fetchCatalogFromSheets();
         }
     });
+    // Tự động đồng bộ định kỳ mỗi 30s — để các máy khác thấy hàng đợi/hóa đơn mới gần như ngay lập tức
+    clearInterval(_autoSyncInterval);
+    _autoSyncInterval = setInterval(() => syncFromSheets(true), 30000);
 };
 
 // ======================== TABS ========================
