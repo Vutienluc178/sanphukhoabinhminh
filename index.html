@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phòng Khám Sản Phụ Khoa Bình Minh - VTL</title>
+    <title>Phòng Khám Sản Phụ Khoa Bình Minh </title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -297,7 +297,7 @@
                     </p>
                     <div class="relative">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-[11px] text-slate-400 text-sm"></i>
-                        <input type="text" id="search-patient" placeholder="Họ tên hoặc số điện thoại..." class="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 text-sm bg-slate-50 focus:bg-white transition-all">
+                        <input type="text" id="search-patient" placeholder="Họ tên hoặc số điện thoại..." oninput="searchPatient()" onfocus="searchPatient()" class="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 text-sm bg-slate-50 focus:bg-white transition-all">
                     </div>
                     <div id="search-results" class="mt-1.5 max-h-48 overflow-y-auto custom-scrollbar border border-slate-100 rounded-xl shadow-lg hidden"></div>
                 </div>
@@ -1784,19 +1784,48 @@ const getAllPatients = () => {
     return Array.from(map.values());
 };
 const searchPatient = () => {
-    const term = document.getElementById('search-patient').value.toLowerCase();
+    const term = document.getElementById('search-patient').value.trim().toLowerCase();
     const resC = document.getElementById('search-results');
-    if(term.length<2) { resC.classList.add('hidden'); return; }
-    const pts = getAllPatients().filter(p=>p.name.toLowerCase().includes(term)||p.phone.includes(term));
+    if(term.length<2) { resC.classList.add('hidden'); resC.innerHTML=''; return; }
+    // Don't re-suggest patients already waiting in today's queue
+    const queuedPhones = new Set(dailyQueue.map(q=>q.patient.phone));
+    const pts = getAllPatients().filter(p=>(p.name.toLowerCase().includes(term)||p.phone.includes(term)) && !queuedPhones.has(p.phone));
     resC.innerHTML = '';
-    if(pts.length===0) resC.innerHTML='<p class="p-3 text-sm text-slate-500 italic">Không tìm thấy.</p>';
-    else pts.forEach(p=>{
-        const div=document.createElement('div'); div.className='p-3 border-b border-slate-100 hover:bg-slate-50 cursor-pointer flex justify-between items-center';
-        div.innerHTML=`<div><p class="font-bold text-slate-800 text-sm">${p.name}</p><p class="text-xs text-slate-500">NS: ${p.yob||'?'} | SĐT: ${p.phone}</p></div><button class="bg-teal-100 text-teal-700 px-3 py-1 rounded text-xs font-bold">Chọn</button>`;
-        div.onclick=()=>{ document.getElementById('rec-id').value=p.id||''; document.getElementById('rec-name').value=p.name; document.getElementById('rec-yob').value=p.yob||''; document.getElementById('rec-phone').value=p.phone; resC.classList.add('hidden'); document.getElementById('search-patient').value=''; };
-        resC.appendChild(div);
-    });
+    if(pts.length===0) {
+        resC.innerHTML='<p class="p-3 text-sm text-slate-500 italic">Không tìm thấy bệnh nhân.</p>';
+    } else {
+        pts.forEach(p=>{
+            const visits = getPatientVisits(p.phone);
+            const lastVisit = visits[0]?.dateStr;
+            const div=document.createElement('div');
+            div.className='p-2.5 border-b border-slate-100 last:border-b-0 hover:bg-slate-50 flex items-center justify-between gap-2';
+            div.innerHTML=`<div class="min-w-0 flex-1 cursor-pointer" data-act="fill">
+                    <p class="font-bold text-slate-800 text-sm truncate">${p.name}</p>
+                    <p class="text-[11px] text-slate-500">NS: ${p.yob||'?'} · SĐT: ${p.phone}${lastVisit?` · Khám gần nhất: ${dateToDisplay(lastVisit)}`:' · Chưa có lịch sử khám'}</p>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button data-act="fill" class="bg-slate-100 text-slate-600 px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors" title="Điền vào form">Chọn</button>
+                    <button data-act="queue" class="bg-teal-600 text-white px-2.5 py-1.5 rounded-lg text-xs font-bold hover:bg-teal-700 transition-colors" title="Đưa thẳng vào hàng đợi"><i class="fa-solid fa-circle-plus mr-1"></i>Hàng đợi</button>
+                </div>`;
+            div.querySelectorAll('[data-act="fill"]').forEach(el=>el.addEventListener('click', ()=>fillReceptionForm(p)));
+            div.querySelector('[data-act="queue"]').addEventListener('click', ()=>quickAddToQueue(p));
+            resC.appendChild(div);
+        });
+    }
     resC.classList.remove('hidden');
+};
+const fillReceptionForm = (p) => {
+    document.getElementById('rec-id').value = p.id||'';
+    document.getElementById('rec-name').value = p.name;
+    document.getElementById('rec-yob').value = p.yob||'';
+    document.getElementById('rec-phone').value = p.phone;
+    document.getElementById('search-results').classList.add('hidden');
+    document.getElementById('search-patient').value = '';
+    document.getElementById('rec-name').focus();
+};
+const quickAddToQueue = (p) => {
+    fillReceptionForm(p);
+    addToQueue();
 };
 const addToQueue = () => {
     const name=document.getElementById('rec-name').value.trim(); const phone=document.getElementById('rec-phone').value.trim();
@@ -1807,7 +1836,16 @@ const addToQueue = () => {
     updatePatientDB(p, null);
     saveToLocal(); clearReceptionForm(); showToast('Đã thêm hàng đợi!'); renderQueue();
 };
-const clearReceptionForm = () => { document.getElementById('form-reception').reset(); document.getElementById('rec-id').value=''; };
+const clearReceptionForm = () => { document.getElementById('form-reception').reset(); document.getElementById('rec-id').value=''; document.getElementById('search-results').classList.add('hidden'); document.getElementById('search-patient').value=''; };
+// Đóng dropdown kết quả tìm kiếm khi bấm ra ngoài
+document.addEventListener('click', (e)=>{
+    const box = document.getElementById('search-results');
+    const input = document.getElementById('search-patient');
+    if(!box || !input) return;
+    if(!box.classList.contains('hidden') && !box.contains(e.target) && e.target!==input) {
+        box.classList.add('hidden');
+    }
+});
 </script>
 
 <script>
