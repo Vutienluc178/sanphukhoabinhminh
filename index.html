@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phòng Khám Sản Phụ Khoa Bình Minh  </title>
+    <title>Phòng Khám Sản Phụ Khoa Bình Minh - GynoFlow</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -136,7 +136,7 @@
                         <td style="padding:5px 8px;font-weight:700;border-bottom:1px solid #f1f5f9;" id="print-p-yob"></td>
                     </tr>
                     <tr>
-                        <td style="padding:5px 10px;color:#64748b;font-weight:700;">Số điện thoại</td>
+                        <td style="padding:5px 10px;color:#64748b;font-weight:700;">SĐT</td>
                         <td style="padding:5px 8px;" id="print-p-phone"></td>
                         <td style="padding:5px 10px;color:#64748b;font-weight:700;border-left:1px solid #f1f5f9;">Bác sĩ</td>
                         <td style="padding:5px 8px;font-weight:700;" id="print-p-doctor"></td>
@@ -171,33 +171,31 @@
                             <td id="print-tax-amount" style="padding:3px 8px;text-align:right;font-weight:700;color:#d97706;"></td>
                         </tr>
                         <tr style="background:#f0fdfa;">
-                            <td colspan="3" style="padding:6px 8px;text-align:right;font-weight:900;font-size:12px;text-transform:uppercase;color:#0f172a;border-top:2px solid #0f766e;">TỔNG CỘNG</td>
+                            <td colspan="3" style="padding:6px 8px;border-top:2px solid #0f766e;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+                                    <span style="font-size:10.5px;font-weight:700;color:#475569;white-space:nowrap;">Hình thức TT: <span id="print-payment-method" style="font-weight:700;color:#0f172a;"></span></span>
+                                    <span style="font-weight:900;font-size:12px;text-transform:uppercase;color:#0f172a;white-space:nowrap;">TỔNG CỘNG</span>
+                                </div>
+                            </td>
                             <td id="print-total" style="padding:6px 8px;text-align:right;font-weight:900;font-size:15px;color:#0f766e;border-top:2px solid #0f766e;white-space:nowrap;"></td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
 
-            <!-- ===== PAYMENT + NOTE ===== -->
-            <div style="margin:0 8mm 5mm;display:flex;gap:8px;align-items:flex-start;font-size:10.5px;">
-                <div style="flex:1;background:#fafafa;border:1px solid #e2e8f0;border-radius:6px;padding:6px 10px;">
-                    <span style="font-weight:700;color:#475569;">Hình thức TT: </span>
-                    <span id="print-payment-method" style="font-weight:600;color:#0f172a;"></span>
-                    <div id="print-note-container" style="display:none;margin-top:4px;font-style:italic;color:#64748b;">
-                        <span style="font-weight:700;font-style:normal;color:#475569;">Ghi chú: </span>
-                        <span id="print-note"></span>
-                    </div>
-                </div>
+            <!-- ===== NOTE (optional) ===== -->
+            <div id="print-note-container" style="display:none;margin:0 8mm 4mm;font-size:10px;font-style:italic;color:#64748b;background:#fafafa;border:1px solid #e2e8f0;border-radius:6px;padding:5px 10px;">
+                <span style="font-weight:700;font-style:normal;color:#475569;">Ghi chú: </span>
+                <span id="print-note"></span>
             </div>
 
             <!-- ===== SIGNATURES ===== -->
-            <div style="margin:0 8mm;display:flex;justify-content:space-between;text-align:center;font-size:10.5px;padding-top:5mm;border-top:1px dashed #cbd5e1;">
+            <div style="margin:0 8mm;display:flex;justify-content:space-between;text-align:center;font-size:10.5px;padding-top:4mm;border-top:1px dashed #cbd5e1;">
                 <div style="width:44%;">
                     <p style="font-weight:700;margin:0 0 28px;">Bệnh nhân</p>
                     <p style="font-style:italic;color:#94a3b8;margin:0;font-size:9px;">(Ký và ghi rõ họ tên)</p>
                 </div>
                 <div style="width:44%;">
-                    <p id="print-sign-date" style="font-style:italic;color:#64748b;margin:0 0 2px;font-size:9.5px;"></p>
                     <p style="font-weight:700;margin:0 0 28px;">Thu ngân</p>
                     <p id="print-cashier-name" style="font-weight:700;margin:0;border-top:1px solid #cbd5e1;padding-top:4px;font-size:10px;"></p>
                 </div>
@@ -218,7 +216,7 @@
     <div class="w-64 bg-dark text-slate-300 flex flex-col shrink-0">
         <div class="p-5 flex items-center gap-3 border-b border-slate-800">
             <div class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center text-white text-xl shadow-lg shadow-teal-500/20"><i class="fa-solid fa-stethoscope"></i></div>
-            <div><h1 class="font-bold text-white leading-tight tracking-wide">VTL</h1><p class="text-[10px] text-teal-400 font-medium uppercase tracking-wider">Clinic Manager</p></div>
+            <div><h1 class="font-bold text-white leading-tight tracking-wide">GynoFlow</h1><p class="text-[10px] text-teal-400 font-medium uppercase tracking-wider">Clinic Manager</p></div>
         </div>
         <div class="px-4 py-3 border-b border-slate-800 text-sm">
             <p class="text-slate-400 text-[11px] uppercase mb-1">Ca trực hiện tại</p>
@@ -755,7 +753,7 @@
                                     <th class="px-5 py-3 font-bold w-32 text-center">Lần Cuối Khám</th>
                                     <th class="px-5 py-3 font-bold w-24 text-center">Số Lần</th>
                                     <th class="px-5 py-3 font-bold w-36 text-right">Tổng Chi</th>
-                                    <th class="px-5 py-3 font-bold w-28 text-center">Thao Tác</th>
+                                    <th class="px-5 py-3 font-bold w-48 text-center">Thao Tác</th>
                                 </tr>
                             </thead>
                             <tbody id="patients-tbody" class="divide-y divide-slate-100"></tbody>
@@ -913,7 +911,7 @@
                         </div>
                         <div>
                             <p class="font-bold text-lg">Cơ chế hoạt động</p>
-                            <p class="text-teal-100 text-sm mt-1">VTL → <strong>Google Apps Script</strong> → <strong>Google Sheets</strong>. Mỗi khi lập hóa đơn, chấm công hoặc phiếu chi, app tự động gửi dữ liệu đến Google Sheets qua HTTPS.</p>
+                            <p class="text-teal-100 text-sm mt-1">GynoFlow → <strong>Google Apps Script</strong> → <strong>Google Sheets</strong>. Mỗi khi lập hóa đơn, chấm công hoặc phiếu chi, app tự động gửi dữ liệu đến Google Sheets qua HTTPS.</p>
                         </div>
                     </div>
                 </div>
@@ -941,7 +939,7 @@
                     </div>
                     <div class="p-5 space-y-2 text-sm text-slate-700">
                         <p>Trong Google Sheets: click menu <strong>Tiện ích mở rộng</strong> → <strong>Apps Script</strong></p>
-                        <p>Một tab mới mở ra — đây là nơi viết code để nhận dữ liệu từ VTL.</p>
+                        <p>Một tab mới mở ra — đây là nơi viết code để nhận dữ liệu từ GynoFlow.</p>
                         <div class="bg-slate-100 rounded-lg p-2 flex items-center gap-2 text-xs text-slate-500 mt-1">
                             <i class="fa-solid fa-arrow-right text-teal-500"></i> Xóa hết code mẫu trong editor, dán đoạn code ở Bước 3 vào.
                         </div>
@@ -957,13 +955,13 @@
                     <div class="p-5">
                         <p class="text-sm text-slate-600 mb-3">Copy toàn bộ đoạn code bên dưới và dán vào Apps Script Editor:</p>
                         <div class="relative">
-                            <pre class="bg-slate-900 text-green-300 rounded-xl p-4 text-[11px] overflow-x-auto custom-scrollbar leading-relaxed"><code id="apps-script-code">// VTL Apps Script v2 — 2 chiều (doGet + doPost) + Setup tự động
+                            <pre class="bg-slate-900 text-green-300 rounded-xl p-4 text-[11px] overflow-x-auto custom-scrollbar leading-relaxed"><code id="apps-script-code">// GynoFlow Apps Script v2 — 2 chiều (doGet + doPost) + Setup tự động
 // BƯỚC 1: Dán đè toàn bộ code này vào Apps Script Editor (Ctrl+A rồi dán)
 // BƯỚC 2: Chọn hàm "setupSheets" ở thanh công cụ → bấm ▶ Run (chạy 1 lần)
 // BƯỚC 3: Deploy → New deployment → Web app → Who has access: Anyone
 
 // ════════════════════════════════════════════════════════════
-// setupSheets(): Tạo đầy đủ 6 sheet đúng chuẩn VTL + dữ liệu mẫu
+// setupSheets(): Tạo đầy đủ 6 sheet đúng chuẩn GynoFlow + dữ liệu mẫu
 // CHẠY HÀM NÀY 1 LẦN trước khi Deploy (chọn "setupSheets" → Run)
 // Nếu sheet đã có dữ liệu, hàm sẽ bỏ qua — không ghi đè dữ liệu cũ
 // ════════════════════════════════════════════════════════════
@@ -1052,7 +1050,7 @@ function setupSheets() {
     if (sh) { ss.setActiveSheet(sh); ss.moveActiveSheet(idx + 1); }
   });
 
-  SpreadsheetApp.getActiveSpreadsheet().toast('Đã khởi tạo đầy đủ 6 sheet theo chuẩn VTL!', 'Setup hoàn tất', 8);
+  SpreadsheetApp.getActiveSpreadsheet().toast('Đã khởi tạo đầy đủ 6 sheet theo chuẩn GynoFlow!', 'Setup hoàn tất', 8);
 }
 
 function doPost(e) {
@@ -1276,7 +1274,7 @@ function _json(obj) {
                 </div>
 
                 <div class="text-center text-sm text-slate-400 pb-4">
-                    <i class="fa-solid fa-code mr-1"></i> VTL v2.0 · Phòng Khám Sản Phụ Khoa Bình Minh
+                    <i class="fa-solid fa-code mr-1"></i> GynoFlow v2.0 · Phòng Khám Sản Phụ Khoa Bình Minh
                 </div>
             </div>
         </div>
@@ -1422,10 +1420,18 @@ function _json(obj) {
                             <span><i class="fa-solid fa-phone text-slate-400 mr-1"></i><span id="pd-phone">---</span></span>
                         </div>
                     </div>
-                    <div class="text-right shrink-0">
-                        <button onclick="bookApptFromPatient()" class="bg-teal-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-teal-700 transition-colors">
+                    <div class="text-right shrink-0 space-y-2 w-44">
+                        <button onclick="bookApptFromPatient()" class="w-full bg-teal-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-teal-700 transition-colors">
                             <i class="fa-solid fa-calendar-plus mr-1"></i>Đặt Lịch Tái Khám
                         </button>
+                        <div class="flex gap-2">
+                            <button onclick="editPatientFromDetail()" class="flex-1 border border-amber-300 text-amber-600 text-xs font-bold px-3 py-2 rounded-lg hover:bg-amber-50 transition-colors">
+                                <i class="fa-solid fa-pen mr-1"></i>Sửa
+                            </button>
+                            <button onclick="deletePatientFromDetail()" class="flex-1 border border-red-300 text-red-600 text-xs font-bold px-3 py-2 rounded-lg hover:bg-red-50 transition-colors">
+                                <i class="fa-solid fa-trash mr-1"></i>Xóa
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <!-- Stats row -->
@@ -1452,6 +1458,32 @@ function _json(obj) {
                 <div id="pd-history" class="space-y-3"></div>
                 <p id="pd-no-history" class="text-center text-slate-400 italic py-6 text-sm hidden">Chưa có lịch sử khám.</p>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: EDIT PATIENT (NEW) -->
+<div id="modal-patient-edit" class="fixed inset-0 bg-slate-900/50 z-[70] flex items-center justify-center hidden">
+    <div class="bg-white rounded-2xl shadow-xl w-[400px] overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+            <h3 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-user-pen text-amber-500 mr-2"></i>Sửa Thông Tin Bệnh Nhân</h3>
+            <button onclick="closeModal('patient-edit')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <div class="p-6 space-y-4">
+            <input type="hidden" id="pe-original-phone">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Họ Tên *</label>
+                <input type="text" id="pe-name" class="w-full px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-teal-500 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Năm Sinh</label>
+                <input type="text" id="pe-yob" placeholder="VD: 1995" class="w-full px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-teal-500 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Số Điện Thoại *</label>
+                <input type="text" id="pe-phone" class="w-full px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-teal-500 text-sm font-mono">
+            </div>
+            <button onclick="savePatientEdit()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-xl transition-colors mt-2">LƯU THAY ĐỔI</button>
         </div>
     </div>
 </div>
@@ -2444,12 +2476,18 @@ const renderPatients = () => {
             </td>
             <td class="px-5 py-3 text-right font-bold text-slate-700">${totalSpent>0?formatMoney(totalSpent):'---'}</td>
             <td class="px-5 py-3 text-center">
-                <div class="flex items-center justify-center gap-2">
-                    <button onclick="event.stopPropagation();openPatientDetail('${p.phone}')" class="text-xs bg-teal-600 text-white font-bold px-3 py-1.5 rounded-lg hover:bg-teal-700 transition-colors">
-                        <i class="fa-solid fa-folder-open mr-1"></i>Xem
+                <div class="flex items-center justify-center gap-1.5">
+                    <button onclick="event.stopPropagation();openPatientDetail('${p.phone}')" class="text-xs bg-teal-600 text-white font-bold px-2.5 py-1.5 rounded-lg hover:bg-teal-700 transition-colors" title="Xem hồ sơ">
+                        <i class="fa-solid fa-folder-open"></i>
                     </button>
                     <button onclick="event.stopPropagation();bookApptForPhone('${p.phone}')" class="text-xs border border-teal-300 text-teal-600 font-bold px-2 py-1.5 rounded-lg hover:bg-teal-50 transition-colors" title="Đặt lịch hẹn">
                         <i class="fa-solid fa-calendar-plus"></i>
+                    </button>
+                    <button onclick="event.stopPropagation();openEditPatientModal('${p.phone}')" class="text-xs border border-amber-300 text-amber-600 font-bold px-2 py-1.5 rounded-lg hover:bg-amber-50 transition-colors" title="Sửa thông tin">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button onclick="event.stopPropagation();deletePatient('${p.phone}')" class="text-xs border border-red-300 text-red-600 font-bold px-2 py-1.5 rounded-lg hover:bg-red-50 transition-colors" title="Xóa bệnh nhân">
+                        <i class="fa-solid fa-trash"></i>
                     </button>
                 </div>
             </td>
@@ -2522,6 +2560,73 @@ const bookApptForPhone = (phone) => {
     openAppointmentModal(null, null);
     setTimeout(()=>selectPatientForAppt(phone), 50);
     document.getElementById('appt-type').value='Tái khám';
+};
+
+// ======================== EDIT / DELETE PATIENT ========================
+const openEditPatientModal = (phone) => {
+    const p = patientDB[phone]; if(!p) return;
+    document.getElementById('pe-original-phone').value = phone;
+    document.getElementById('pe-name').value  = p.name || '';
+    document.getElementById('pe-yob').value   = p.yob  || '';
+    document.getElementById('pe-phone').value = p.phone || phone;
+    openModal('patient-edit');
+};
+
+const editPatientFromDetail = () => {
+    if(!selectedPatientPhone) return;
+    openEditPatientModal(selectedPatientPhone);
+};
+
+const savePatientEdit = () => {
+    const oldPhone  = document.getElementById('pe-original-phone').value;
+    const name      = document.getElementById('pe-name').value.trim();
+    const yob       = document.getElementById('pe-yob').value.trim();
+    const newPhone  = document.getElementById('pe-phone').value.trim();
+    const p = patientDB[oldPhone];
+    if(!p) { showToast('Không tìm thấy bệnh nhân!', true); return; }
+    if(!name)     { showToast('Vui lòng nhập họ tên!', true); return; }
+    if(!newPhone) { showToast('Vui lòng nhập số điện thoại!', true); return; }
+    if(newPhone !== oldPhone && patientDB[newPhone]) {
+        showToast('Số điện thoại này đã thuộc về bệnh nhân khác!', true);
+        return;
+    }
+
+    p.name  = name;
+    p.yob   = yob;
+    p.phone = newPhone;
+
+    if(newPhone !== oldPhone) {
+        delete patientDB[oldPhone];
+        patientDB[newPhone] = p;
+        if(selectedPatientPhone === oldPhone) selectedPatientPhone = newPhone;
+    }
+
+    savePersistentData();
+    renderPatients();
+    closeModal('patient-edit');
+    showToast('Đã cập nhật thông tin bệnh nhân ✓');
+
+    if(!document.getElementById('modal-patient-detail').classList.contains('hidden') && selectedPatientPhone === newPhone) {
+        openPatientDetail(newPhone);
+    }
+};
+
+const deletePatient = (phone) => {
+    const p = patientDB[phone]; if(!p) return;
+    _requireAdmin(() => {
+        const ok = confirm(`Xác nhận XÓA bệnh nhân "${p.name}" (SĐT: ${p.phone})?\n\nHồ sơ và lịch sử khám của bệnh nhân này sẽ bị xóa khỏi danh sách. Các hóa đơn đã lập trước đó vẫn được giữ trong báo cáo doanh thu.`);
+        if(!ok) return;
+        delete patientDB[phone];
+        savePersistentData();
+        renderPatients();
+        if(selectedPatientPhone === phone) closeModal('patient-detail');
+        showToast('Đã xóa bệnh nhân ✓');
+    });
+};
+
+const deletePatientFromDetail = () => {
+    if(!selectedPatientPhone) return;
+    deletePatient(selectedPatientPhone);
 };
 
 // ======================== SETTINGS MODULE ========================
@@ -3024,8 +3129,6 @@ const _populatePrintArea = (inv) => {
     const pnc = document.getElementById('print-note-container');
     if(inv.note){ pnc.style.display=''; _s('print-note', inv.note); } else pnc.style.display='none';
 
-    const pD = new Date();
-    _s('print-sign-date', `TP. Hồ Chí Minh, ngày ${pD.getDate().toString().padStart(2,'0')} tháng ${(pD.getMonth()+1).toString().padStart(2,'0')} năm ${pD.getFullYear()}`);
     _s('print-cashier-name', inv.cashier || currentUser.name);
 };
 
