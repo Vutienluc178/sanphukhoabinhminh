@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phòng Khám Sản Phụ Khoa Bình Minh - GynoFlow</title>
+    <title>Phòng Khám Sản Phụ Khoa Bình Minh - VTL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -216,7 +216,7 @@
     <div class="w-64 bg-dark text-slate-300 flex flex-col shrink-0">
         <div class="p-5 flex items-center gap-3 border-b border-slate-800">
             <div class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center text-white text-xl shadow-lg shadow-teal-500/20"><i class="fa-solid fa-stethoscope"></i></div>
-            <div><h1 class="font-bold text-white leading-tight tracking-wide">GynoFlow</h1><p class="text-[10px] text-teal-400 font-medium uppercase tracking-wider">Clinic Manager</p></div>
+            <div><h1 class="font-bold text-white leading-tight tracking-wide">VTL</h1><p class="text-[10px] text-teal-400 font-medium uppercase tracking-wider">Clinic Manager</p></div>
         </div>
         <div class="px-4 py-3 border-b border-slate-800 text-sm">
             <p class="text-slate-400 text-[11px] uppercase mb-1">Ca trực hiện tại</p>
@@ -911,7 +911,7 @@
                         </div>
                         <div>
                             <p class="font-bold text-lg">Cơ chế hoạt động</p>
-                            <p class="text-teal-100 text-sm mt-1">GynoFlow → <strong>Google Apps Script</strong> → <strong>Google Sheets</strong>. Mỗi khi lập hóa đơn, chấm công hoặc phiếu chi, app tự động gửi dữ liệu đến Google Sheets qua HTTPS.</p>
+                            <p class="text-teal-100 text-sm mt-1">VTL → <strong>Google Apps Script</strong> → <strong>Google Sheets</strong>. Mỗi khi lập hóa đơn, chấm công hoặc phiếu chi, app tự động gửi dữ liệu đến Google Sheets qua HTTPS.</p>
                         </div>
                     </div>
                 </div>
@@ -939,7 +939,7 @@
                     </div>
                     <div class="p-5 space-y-2 text-sm text-slate-700">
                         <p>Trong Google Sheets: click menu <strong>Tiện ích mở rộng</strong> → <strong>Apps Script</strong></p>
-                        <p>Một tab mới mở ra — đây là nơi viết code để nhận dữ liệu từ GynoFlow.</p>
+                        <p>Một tab mới mở ra — đây là nơi viết code để nhận dữ liệu từ VTL.</p>
                         <div class="bg-slate-100 rounded-lg p-2 flex items-center gap-2 text-xs text-slate-500 mt-1">
                             <i class="fa-solid fa-arrow-right text-teal-500"></i> Xóa hết code mẫu trong editor, dán đoạn code ở Bước 3 vào.
                         </div>
@@ -955,13 +955,13 @@
                     <div class="p-5">
                         <p class="text-sm text-slate-600 mb-3">Copy toàn bộ đoạn code bên dưới và dán vào Apps Script Editor:</p>
                         <div class="relative">
-                            <pre class="bg-slate-900 text-green-300 rounded-xl p-4 text-[11px] overflow-x-auto custom-scrollbar leading-relaxed"><code id="apps-script-code">// GynoFlow Apps Script v2 — 2 chiều (doGet + doPost) + Setup tự động
+                            <pre class="bg-slate-900 text-green-300 rounded-xl p-4 text-[11px] overflow-x-auto custom-scrollbar leading-relaxed"><code id="apps-script-code">// VTL Apps Script v2 — 2 chiều (doGet + doPost) + Setup tự động
 // BƯỚC 1: Dán đè toàn bộ code này vào Apps Script Editor (Ctrl+A rồi dán)
 // BƯỚC 2: Chọn hàm "setupSheets" ở thanh công cụ → bấm ▶ Run (chạy 1 lần)
 // BƯỚC 3: Deploy → New deployment → Web app → Who has access: Anyone
 
 // ════════════════════════════════════════════════════════════
-// setupSheets(): Tạo đầy đủ 6 sheet đúng chuẩn GynoFlow + dữ liệu mẫu
+// setupSheets(): Tạo đầy đủ 6 sheet đúng chuẩn VTL + dữ liệu mẫu
 // CHẠY HÀM NÀY 1 LẦN trước khi Deploy (chọn "setupSheets" → Run)
 // Nếu sheet đã có dữ liệu, hàm sẽ bỏ qua — không ghi đè dữ liệu cũ
 // ════════════════════════════════════════════════════════════
@@ -1050,7 +1050,7 @@ function setupSheets() {
     if (sh) { ss.setActiveSheet(sh); ss.moveActiveSheet(idx + 1); }
   });
 
-  SpreadsheetApp.getActiveSpreadsheet().toast('Đã khởi tạo đầy đủ 6 sheet theo chuẩn GynoFlow!', 'Setup hoàn tất', 8);
+  SpreadsheetApp.getActiveSpreadsheet().toast('Đã khởi tạo đầy đủ 6 sheet theo chuẩn VTL!', 'Setup hoàn tất', 8);
 }
 
 function doPost(e) {
@@ -1274,7 +1274,7 @@ function _json(obj) {
                 </div>
 
                 <div class="text-center text-sm text-slate-400 pb-4">
-                    <i class="fa-solid fa-code mr-1"></i> GynoFlow v2.0 · Phòng Khám Sản Phụ Khoa Bình Minh
+                    <i class="fa-solid fa-code mr-1"></i> VTL v2.0 · Phòng Khám Sản Phụ Khoa Bình Minh
                 </div>
             </div>
         </div>
