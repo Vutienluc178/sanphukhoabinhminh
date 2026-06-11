@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phòng Khám Sản Phụ Khoa Bình Minh </title>
+    <title>Phòng Khám Sản Phụ Khoa Bình Minh - VTL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
     <script>
         tailwind.config = {
             theme: { extend: { colors: { primary: '#14b8a6', secondary: '#0f766e', dark: '#0f172a', light: '#f8fafc' } } }
@@ -107,6 +108,8 @@
 
             <!-- ===== HEADER ===== -->
             <div style="display:flex;align-items:stretch;gap:0;padding:8mm 8mm 6mm;border-bottom:3px solid #0f766e;background:linear-gradient(135deg,#f0fdfa 0%,#ffffff 60%);">
+                <!-- Logo -->
+                <img src="https://i.ibb.co/0R9j8x2N/ca314532eea6.jpg" alt="Logo" style="width:16mm;height:16mm;object-fit:cover;border-radius:6px;margin-right:8px;flex-shrink:0;">
                 <!-- Accent bar -->
                 <div style="width:5px;background:#0f766e;border-radius:4px;margin-right:10px;flex-shrink:0;"></div>
                 <div style="flex:1;">
@@ -215,7 +218,7 @@
     <!-- SIDEBAR -->
     <div class="w-64 bg-dark text-slate-300 flex flex-col shrink-0">
         <div class="p-5 flex items-center gap-3 border-b border-slate-800">
-            <div class="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center text-white text-xl shadow-lg shadow-teal-500/20"><i class="fa-solid fa-stethoscope"></i></div>
+            <img src="https://i.ibb.co/0R9j8x2N/ca314532eea6.jpg" alt="Logo" class="w-10 h-10 rounded-lg object-cover shadow-lg shadow-teal-500/20">
             <div><h1 class="font-bold text-white leading-tight tracking-wide">VTL</h1><p class="text-[10px] text-teal-400 font-medium uppercase tracking-wider">Clinic Manager</p></div>
         </div>
         <div class="px-4 py-3 border-b border-slate-800 text-sm">
@@ -516,7 +519,7 @@
                         <div class="grid grid-cols-2 gap-2 mb-2">
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Bác sĩ thực hiện</label>
-                                <input type="text" id="invoice-doctor" class="w-full px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-teal-500 text-sm" value="CK2 Lê Đàm Vân">
+                                <input type="text" id="invoice-doctor" class="w-full px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-teal-500 text-sm" value="BS. Lê Đàm Vân">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Hình thức TT</label>
@@ -658,7 +661,10 @@
             <div class="max-w-6xl mx-auto">
                 <div class="flex justify-between items-end mb-6">
                     <div><h2 class="text-2xl font-bold text-slate-800">Thống Kê Chi Tiết</h2><p class="text-sm text-slate-500 mt-1">Lọc dữ liệu kế toán theo khoảng thời gian</p></div>
-                    <button onclick="exportToCSV()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition-colors flex items-center gap-2"><i class="fa-solid fa-file-excel"></i> Xuất CSV</button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="exportTaxReport()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition-colors flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> Xuất Báo Cáo Thuế</button>
+                        <button onclick="exportToCSV()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-md transition-colors flex items-center gap-2"><i class="fa-solid fa-file-excel"></i> Xuất CSV</button>
+                    </div>
                 </div>
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6 flex items-end gap-4">
                     <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Từ ngày</label><input type="date" id="stat-date-from" class="px-4 py-2 rounded-lg border border-slate-200 outline-none text-sm bg-slate-50"></div>
@@ -710,6 +716,22 @@
                     </div>
                     <div id="appt-today-list" class="divide-y divide-slate-100 max-h-80 overflow-y-auto custom-scrollbar">
                         <p class="p-6 text-center text-slate-400 italic text-sm">Không có lịch hẹn nào hôm nay.</p>
+                    </div>
+                </div>
+
+                <!-- Upcoming Follow-up Appointments -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-6">
+                    <div class="px-5 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-700"><i class="fa-solid fa-rotate-left text-blue-500 mr-2"></i>Lịch Tái Khám Sắp Tới</h3>
+                        <div class="flex items-center gap-3">
+                            <span id="appt-followup-count-text" class="text-xs text-slate-500">0 lịch hẹn</span>
+                            <button onclick="exportFollowUpAppointments()" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-lg font-bold text-xs shadow-sm transition-colors flex items-center gap-1.5">
+                                <i class="fa-solid fa-file-excel"></i> Xuất DS Tái Khám
+                            </button>
+                        </div>
+                    </div>
+                    <div id="appt-followup-list" class="divide-y divide-slate-100 max-h-80 overflow-y-auto custom-scrollbar">
+                        <p class="p-6 text-center text-slate-400 italic text-sm">Không có lịch tái khám sắp tới.</p>
                     </div>
                 </div>
             </div>
@@ -800,10 +822,15 @@
                             <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Địa Chỉ</label>
                             <input type="text" id="cfg-clinic-addr" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-teal-500 text-sm" placeholder="VD: 2B Kênh nước đen - P. Bình Hưng Hòa - TP. HCM">
                         </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Mã Số Thuế Hộ Kinh Doanh</label>
+                            <input type="text" id="cfg-tax-code" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-teal-500 text-sm font-mono" placeholder="VD: 0312345678">
+                            <p class="text-[11px] text-slate-400 mt-1">Dùng để in trên Sổ doanh thu (Mẫu S1a-HKD) khi xuất báo cáo thuế</p>
+                        </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Bác Sĩ Mặc Định</label>
-                                <input type="text" id="cfg-doctor" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-teal-500 text-sm" placeholder="CK2 Lê Đàm Vân">
+                                <input type="text" id="cfg-doctor" class="w-full px-3 py-2.5 rounded-xl border border-slate-200 outline-none focus:border-teal-500 text-sm" placeholder="BS. Lê Đàm Vân">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Ghi Chú Footer Hóa Đơn</label>
@@ -1380,7 +1407,7 @@ function _json(obj) {
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Bác Sĩ</label>
-                    <input type="text" id="appt-doctor" value="CK2 Lê Đàm Vân" class="w-full px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-teal-500 text-sm">
+                    <input type="text" id="appt-doctor" value="BS. Lê Đàm Vân" class="w-full px-3 py-2 rounded-lg border border-slate-200 outline-none focus:border-teal-500 text-sm">
                 </div>
             </div>
             <!-- Notes -->
@@ -2148,6 +2175,172 @@ const exportToCSV=()=>{
     invoiceHistory.filter(i=>i.dateStr>=f&&i.dateStr<=t).forEach(i=>csv+=`"${i.dateStr}","${i.invId}","${i.patient.name}","${i.doctor}","${i.paymentMethod}","${i.total}","${i.cashier}"\n`);
     const l=document.createElement("a"); l.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:'text/csv;charset=utf-8;'})); l.download=`DoanhThu_${f}_${t}.csv`; l.click();
 };
+
+// ======================== TAX REPORT EXPORT (Mẫu S1a-HKD - TT 152/2025/TT-BTC) ========================
+const exportTaxReport = async () => {
+    const f = document.getElementById('stat-date-from').value;
+    const t = document.getElementById('stat-date-to').value;
+    if(!f || !t){ showToast('Vui lòng chọn khoảng thời gian!', true); return; }
+    if(typeof ExcelJS === 'undefined'){ showToast('Không tải được thư viện Excel. Kiểm tra kết nối mạng!', true); return; }
+
+    // Chỉ lấy các hóa đơn có doanh thu DỊCH VỤ (bỏ qua thuốc/vật tư)
+    const rows = [];
+    invoiceHistory.filter(i=>i.dateStr>=f && i.dateStr<=t).forEach(inv=>{
+        const serviceItems = (inv.items||[]).filter(it=>it.type==='service');
+        const amount = serviceItems.reduce((s,it)=>s+(it.qty*it.price),0);
+        if(amount<=0) return;
+        const names = serviceItems.map(it=>it.name).join(', ');
+        rows.push({
+            dateStr: inv.dateStr,
+            desc: `Thu tiền dịch vụ - HĐ ${inv.invId} - BN: ${inv.patient.name} (${names})`,
+            amount
+        });
+    });
+
+    if(rows.length===0){ showToast('Không có doanh thu dịch vụ trong khoảng thời gian đã chọn!', true); return; }
+    rows.sort((a,b)=> a.dateStr<b.dateStr?-1 : a.dateStr>b.dateStr?1 : 0);
+
+    const FONT='Times New Roman';
+    const thin={style:'thin'};
+    const allBorder={top:thin,left:thin,bottom:thin,right:thin};
+
+    const wb = new ExcelJS.Workbook();
+    wb.creator = appSettings.clinicName;
+    wb.created = new Date();
+    const ws = wb.addWorksheet('So doanh thu', { views:[{ showGridLines:false }] });
+    ws.columns = [ { width: 16 }, { width: 62 }, { width: 20 } ];
+    ws.properties.defaultRowHeight = 18;
+
+    // --- Mẫu số (góc phải) ---
+    ws.mergeCells('B1:C1');
+    ws.getCell('B1').value = 'Mẫu số S1a-HKD';
+    ws.getCell('B1').font = { name:FONT, italic:true, size:11 };
+    ws.getCell('B1').alignment = { horizontal:'right' };
+
+    ws.mergeCells('B2:C2');
+    ws.getCell('B2').value = '(Ban hành kèm theo Thông tư số 152/2025/TT-BTC\nngày 31/12/2025 của Bộ trưởng Bộ Tài chính)';
+    ws.getCell('B2').font = { name:FONT, italic:true, size:9 };
+    ws.getCell('B2').alignment = { horizontal:'right', wrapText:true, vertical:'top' };
+    ws.getRow(2).height = 28;
+
+    // --- Thông tin hộ kinh doanh ---
+    ws.getCell('A4').value = 'Tên hộ kinh doanh, cá nhân kinh doanh:';
+    ws.getCell('A4').font = { name:FONT, bold:true, size:11 };
+    ws.mergeCells('B4:C4');
+    ws.getCell('B4').value = appSettings.clinicName;
+    ws.getCell('B4').font = { name:FONT, size:11 };
+
+    ws.getCell('A5').value = 'Địa chỉ:';
+    ws.getCell('A5').font = { name:FONT, bold:true, size:11 };
+    ws.mergeCells('B5:C5');
+    ws.getCell('B5').value = appSettings.clinicAddr;
+    ws.getCell('B5').font = { name:FONT, size:11 };
+
+    ws.getCell('A6').value = 'Mã số thuế:';
+    ws.getCell('A6').font = { name:FONT, bold:true, size:11 };
+    ws.mergeCells('B6:C6');
+    ws.getCell('B6').value = appSettings.taxCode || '';
+    ws.getCell('B6').font = { name:FONT, size:11 };
+
+    // --- Tiêu đề ---
+    ws.mergeCells('A8:C8');
+    ws.getCell('A8').value = 'SỔ DOANH THU BÁN HÀNG HÓA, DỊCH VỤ';
+    ws.getCell('A8').font = { name:FONT, bold:true, size:14 };
+    ws.getCell('A8').alignment = { horizontal:'center' };
+
+    ws.mergeCells('A9:C9');
+    ws.getCell('A9').value = `Từ ngày ${dateToDisplay(f)} đến ngày ${dateToDisplay(t)}`;
+    ws.getCell('A9').font = { name:FONT, italic:true, size:11 };
+    ws.getCell('A9').alignment = { horizontal:'center' };
+
+    // --- Header bảng (dòng 11: tên cột, dòng 12: ký hiệu cột) ---
+    ws.getCell('A11').value = 'Ngày, tháng ghi sổ';
+    ws.getCell('B11').value = 'Diễn giải';
+    ws.getCell('C11').value = 'Số tiền (đồng)';
+    ws.getCell('A12').value = 'A';
+    ws.getCell('B12').value = 'B';
+    ws.getCell('C12').value = '1';
+    [11,12].forEach(r=>{
+        ['A','B','C'].forEach(col=>{
+            const cell = ws.getCell(`${col}${r}`);
+            cell.font = { name:FONT, bold:true, size:11 };
+            cell.alignment = { horizontal:'center', vertical:'middle', wrapText:true };
+            cell.border = allBorder;
+        });
+    });
+    ws.getRow(11).height = 24;
+
+    // --- Dữ liệu ---
+    let rowIdx = 13;
+    rows.forEach(r=>{
+        ws.getCell(`A${rowIdx}`).value = dateToDisplay(r.dateStr);
+        ws.getCell(`B${rowIdx}`).value = r.desc;
+        ws.getCell(`C${rowIdx}`).value = r.amount;
+        ws.getCell(`A${rowIdx}`).alignment = { horizontal:'center', vertical:'middle' };
+        ws.getCell(`B${rowIdx}`).alignment = { vertical:'middle', wrapText:true };
+        ws.getCell(`C${rowIdx}`).alignment = { horizontal:'right', vertical:'middle' };
+        ws.getCell(`C${rowIdx}`).numFmt = '#,##0';
+        ['A','B','C'].forEach(col=>{
+            ws.getCell(`${col}${rowIdx}`).font = { name:FONT, size:11 };
+            ws.getCell(`${col}${rowIdx}`).border = allBorder;
+        });
+        rowIdx++;
+    });
+
+    // --- Dòng cộng ---
+    const totalRow = rowIdx;
+    ws.mergeCells(`A${totalRow}:B${totalRow}`);
+    ws.getCell(`A${totalRow}`).value = 'CỘNG';
+    ws.getCell(`A${totalRow}`).alignment = { horizontal:'right', vertical:'middle' };
+    ws.getCell(`C${totalRow}`).value = { formula: `SUM(C13:C${totalRow-1})` };
+    ws.getCell(`C${totalRow}`).numFmt = '#,##0';
+    ws.getCell(`C${totalRow}`).alignment = { horizontal:'right', vertical:'middle' };
+    ['A','B','C'].forEach(col=>{
+        ws.getCell(`${col}${totalRow}`).font = { name:FONT, bold:true, size:11 };
+        ws.getCell(`${col}${totalRow}`).border = allBorder;
+    });
+
+    // --- Chữ ký ---
+    const today = new Date();
+    let r2 = totalRow + 2;
+    ws.mergeCells(`A${r2}:C${r2}`);
+    ws.getCell(`A${r2}`).value = `Ngày ${today.getDate()} tháng ${today.getMonth()+1} năm ${today.getFullYear()}`;
+    ws.getCell(`A${r2}`).font = { name:FONT, italic:true, size:11 };
+    ws.getCell(`A${r2}`).alignment = { horizontal:'center' };
+
+    r2++;
+    ws.getCell(`A${r2}`).value = 'NGƯỜI LẬP SỔ';
+    ws.mergeCells(`B${r2}:C${r2}`);
+    ws.getCell(`B${r2}`).value = 'NGƯỜI ĐẠI DIỆN HỘ KINH DOANH, CÁ NHÂN KINH DOANH';
+    ['A','B'].forEach(col=>{
+        const cell = ws.getCell(`${col}${r2}`);
+        cell.font = { name:FONT, bold:true, size:11 };
+        cell.alignment = { horizontal:'center', wrapText:true };
+    });
+
+    r2++;
+    ws.getCell(`A${r2}`).value = '(Ký, ghi rõ họ tên)';
+    ws.mergeCells(`B${r2}:C${r2}`);
+    ws.getCell(`B${r2}`).value = '(Ký, đóng dấu, ghi rõ họ tên)';
+    ['A','B'].forEach(col=>{
+        const cell = ws.getCell(`${col}${r2}`);
+        cell.font = { name:FONT, italic:true, size:10 };
+        cell.alignment = { horizontal:'center' };
+    });
+
+    r2 += 4;
+    ws.getCell(`A${r2}`).value = currentUser.name || '';
+    ws.getCell(`A${r2}`).font = { name:FONT, size:11 };
+    ws.getCell(`A${r2}`).alignment = { horizontal:'center' };
+
+    const buf = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const l = document.createElement('a');
+    l.href = URL.createObjectURL(blob);
+    l.download = `SoDoanhThu_S1aHKD_${f}_${t}.xlsx`;
+    l.click();
+    showToast('Đã xuất Sổ doanh thu (Mẫu S1a-HKD)!');
+};
 </script>
 
 <script>
@@ -2253,6 +2446,7 @@ const renderAppointmentsTab = () => {
 
     // Today's agenda list
     renderTodayAgenda();
+    renderFollowUpList();
     updateApptBadge();
 };
 
@@ -2470,6 +2664,134 @@ const copyZaloReminder = (apptId) => {
         prompt('Copy tin nhắn này:', msg);
     }
 };
+
+// ---- Lịch tái khám: tin nhắn trang trọng & xuất danh sách ----
+
+const formatFollowUpMessage = (appt) => {
+    const dateDisplay = dateToDisplay(appt.date);
+    const clinicName = appSettings.clinicName || 'Phòng Khám Sản Phụ Khoa Bình Minh';
+    const phone = appSettings.clinicPhone || '';
+    const reasonPart = appt.notes ? ` (${appt.notes})` : '';
+    return `Kính gửi Quý khách ${appt.patientName},\n\n`
+        + `${clinicName} xin trân trọng thông báo: theo chỉ định của bác sĩ, Quý khách có lịch TÁI KHÁM vào lúc ${appt.time} ngày ${dateDisplay}${reasonPart}.\n\n`
+        + `Việc tái khám đúng hẹn có ý nghĩa rất quan trọng, giúp bác sĩ theo dõi sát tình trạng sức khỏe và đảm bảo hiệu quả điều trị tốt nhất dành cho Quý khách. Kính mong Quý khách sắp xếp thời gian đến đúng lịch hẹn.\n\n`
+        + `Mọi thắc mắc xin vui lòng liên hệ: ${phone}.\n`
+        + `${clinicName} xin chân thành cảm ơn sự tin tưởng của Quý khách!`;
+};
+
+const getUpcomingFollowUps = () => {
+    const today = getTodayString();
+    return appointments
+        .filter(a => a.type === 'Tái khám' && a.status !== 'cancelled' && a.date >= today)
+        .sort((a,b) => a.date===b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date));
+};
+
+const renderFollowUpList = () => {
+    const list = getUpcomingFollowUps();
+    const container = document.getElementById('appt-followup-list');
+    document.getElementById('appt-followup-count-text').innerText = `${list.length} lịch hẹn`;
+    if(list.length===0){
+        container.innerHTML = '<p class="p-6 text-center text-slate-400 italic text-sm">Không có lịch tái khám sắp tới.</p>';
+        return;
+    }
+    const today = getTodayString();
+    container.innerHTML = '';
+    list.forEach(a=>{
+        const isToday = a.date===today;
+        container.innerHTML += `<div class="px-5 py-3 flex items-center gap-4">
+            <div class="w-20 text-center shrink-0">
+                <p class="text-xs font-bold ${isToday?'text-teal-600':'text-blue-600'}">${isToday?'Hôm nay':dateToDisplay(a.date)}</p>
+                <p class="text-sm font-black text-slate-700">${a.time}</p>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="font-bold text-slate-800 truncate">${a.patientName}</p>
+                <div class="flex items-center gap-2 mt-0.5">
+                    <span class="text-[11px] text-slate-400">${a.patientPhone}</span>
+                    ${a.notes?`<span class="text-[11px] text-slate-400 truncate">· ${a.notes}</span>`:''}
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <button onclick="copyFollowUpMessage('${a.id}')" class="text-xs text-blue-600 hover:text-blue-800 border border-blue-200 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5" title="Copy tin nhắn nhắc tái khám">
+                    <i class="fa-solid fa-comment-dots"></i> Copy tin nhắn
+                </button>
+            </div>
+        </div>`;
+    });
+};
+
+const copyFollowUpMessage = (apptId) => {
+    const appt = appointments.find(a=>a.id===apptId); if(!appt) return;
+    const msg = formatFollowUpMessage(appt);
+    if(navigator.clipboard){
+        navigator.clipboard.writeText(msg).then(()=>showToast('Đã copy tin nhắn nhắc tái khám! Paste vào Zalo/SMS để gửi.'));
+    } else {
+        prompt('Copy tin nhắn này:', msg);
+    }
+};
+
+const exportFollowUpAppointments = async () => {
+    const list = getUpcomingFollowUps();
+    if(list.length===0){ showToast('Không có lịch tái khám sắp tới để xuất!', true); return; }
+    if(typeof ExcelJS === 'undefined'){ showToast('Không tải được thư viện Excel. Kiểm tra kết nối mạng!', true); return; }
+
+    const FONT='Arial';
+    const thin={style:'thin'};
+    const allBorder={top:thin,left:thin,bottom:thin,right:thin};
+
+    const wb = new ExcelJS.Workbook();
+    wb.creator = appSettings.clinicName;
+    wb.created = new Date();
+    const ws = wb.addWorksheet('DS Tai Kham', { views:[{ showGridLines:false }] });
+    ws.columns = [
+        { width: 6 }, { width: 24 }, { width: 16 }, { width: 14 }, { width: 8 }, { width: 24 }, { width: 75 }
+    ];
+
+    ws.mergeCells('A1:G1');
+    ws.getCell('A1').value = `DANH SÁCH LỊCH TÁI KHÁM - ${(appSettings.clinicName||'').toUpperCase()}`;
+    ws.getCell('A1').font = { name:FONT, bold:true, size:13 };
+    ws.getCell('A1').alignment = { horizontal:'center' };
+    ws.getRow(1).height = 22;
+
+    ws.mergeCells('A2:G2');
+    ws.getCell('A2').value = `Xuất ngày ${dateToDisplay(getTodayString())} — gồm tất cả lịch tái khám sắp tới (chưa hủy)`;
+    ws.getCell('A2').font = { name:FONT, italic:true, size:10, color:{argb:'FF64748B'} };
+    ws.getCell('A2').alignment = { horizontal:'center' };
+
+    const headers = ['STT','Họ Tên','Số Điện Thoại','Ngày Tái Khám','Giờ','Lý Do / Ghi Chú','Tin Nhắn Gửi Bệnh Nhân'];
+    headers.forEach((h,i)=>{
+        const cell = ws.getCell(4, i+1);
+        cell.value = h;
+        cell.font = { name:FONT, bold:true, size:11, color:{argb:'FFFFFFFF'} };
+        cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FF0F766E'} };
+        cell.alignment = { horizontal:'center', vertical:'middle', wrapText:true };
+        cell.border = allBorder;
+    });
+    ws.getRow(4).height = 24;
+
+    let rowIdx = 5;
+    list.forEach((a,i)=>{
+        const values = [i+1, a.patientName, a.patientPhone, dateToDisplay(a.date), a.time, a.notes||'', formatFollowUpMessage(a)];
+        values.forEach((val,c)=>{
+            const cell = ws.getCell(rowIdx, c+1);
+            cell.value = val;
+            cell.font = { name:FONT, size:10 };
+            cell.border = allBorder;
+            cell.alignment = c===6
+                ? { wrapText:true, vertical:'top', horizontal:'left' }
+                : { vertical:'middle', horizontal: (c===0||c===3||c===4) ? 'center' : 'left' };
+        });
+        ws.getRow(rowIdx).height = 105;
+        rowIdx++;
+    });
+
+    const buf = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const l = document.createElement('a');
+    l.href = URL.createObjectURL(blob);
+    l.download = `DanhSachTaiKham_${getTodayString()}.xlsx`;
+    l.click();
+    showToast('Đã xuất danh sách lịch tái khám!');
+};
 </script>
 
 <script>
@@ -2673,7 +2995,8 @@ const DEFAULT_SETTINGS = {
     clinicName:    'Phòng Khám Sản Phụ Khoa Bình Minh',
     clinicAddr:    '2B Kênh nước đen - P. Bình Hưng Hòa - TP. Hồ Chí Minh',
     clinicPhone:   '0906.404.312',
-    doctor:        'CK2 Lê Đàm Vân',
+    taxCode:       '',
+    doctor:        'BS. Lê Đàm Vân',
     invoiceFooter: 'Cảm ơn quý khách đã tin tưởng dịch vụ của phòng khám!',
     sheetId:       '1R-WhT9_uKdKbQch1gvyqecjW0wuo4a9av2VLLyUdgWg',
     webAppUrl:     'https://script.google.com/macros/s/AKfycbyTT1jVzVOiykgqHRk6Cgkq5T6W1xzxbxLjnYlGLDQpvL121y6pt2St1qaAqFxbAexvXg/exec',
@@ -2723,6 +3046,7 @@ const populateSettingsForm = () => {
     document.getElementById('cfg-clinic-name').value  = appSettings.clinicName;
     document.getElementById('cfg-clinic-addr').value  = appSettings.clinicAddr;
     document.getElementById('cfg-clinic-phone').value = appSettings.clinicPhone;
+    document.getElementById('cfg-tax-code').value     = appSettings.taxCode;
     document.getElementById('cfg-doctor').value       = appSettings.doctor;
     document.getElementById('cfg-invoice-footer').value = appSettings.invoiceFooter;
     document.getElementById('cfg-sheet-id').value     = appSettings.sheetId;
@@ -2745,6 +3069,7 @@ const saveSettings = () => {
         clinicName:    document.getElementById('cfg-clinic-name').value.trim() || DEFAULT_SETTINGS.clinicName,
         clinicAddr:    document.getElementById('cfg-clinic-addr').value.trim() || DEFAULT_SETTINGS.clinicAddr,
         clinicPhone:   document.getElementById('cfg-clinic-phone').value.trim() || DEFAULT_SETTINGS.clinicPhone,
+        taxCode:       document.getElementById('cfg-tax-code').value.trim(),
         doctor:        document.getElementById('cfg-doctor').value.trim() || DEFAULT_SETTINGS.doctor,
         invoiceFooter: document.getElementById('cfg-invoice-footer').value.trim() || DEFAULT_SETTINGS.invoiceFooter,
         sheetId:       document.getElementById('cfg-sheet-id').value.trim(),
